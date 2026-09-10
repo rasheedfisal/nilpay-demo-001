@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NilPay & NGO - Complete Reports Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7fc;
+            padding: 30px 20px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER WITH LOGO ===== */
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #0a3d62 0%, #1a7b5e 100%);
+            padding: 20px 30px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 6px 24px rgba(10, 61, 98, 0.25);
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+            font-family: 'Segoe UI', sans-serif;
+            letter-spacing: -0.5px;
+            padding: 0 4px;
+        }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .logo-text .brand {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+            line-height: 1.1;
+        }
+        .logo-text .brand span {
+            color: #a8e6cf;
+        }
+        .logo-text .tagline-ar {
+            font-size: 16px;
+            color: #cbd5e1;
+            font-weight: 400;
+            direction: rtl;
+            letter-spacing: 0.5px;
+        }
+        .header-title {
+            text-align: right;
+        }
+        .header-title h1 {
+            font-size: 22px;
+            color: #ffffff;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.3px;
+        }
+        .header-title .sub {
+            font-size: 13px;
+            color: #a8e6cf;
+            font-weight: 300;
+            margin-top: 2px;
+        }
+        .print-btn {
+            background: #ffffff;
+            color: #0a3d62;
+            border: none;
+            padding: 10px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            background: #f1f9f6;
+        }
+
+        /* ===== REPORT STYLES ===== */
+        .report-section {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            padding: 24px 20px 28px;
+            margin-bottom: 40px;
+            border: 1px solid #e9edf2;
+            overflow-x: auto;
+        }
+        .report-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0a3d62;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .report-title span {
+            background: #1a7b5e;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 30px;
+        }
+        .report-desc {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 16px;
+            border-bottom: 1px dashed #dce2ea;
+            padding-bottom: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 700px;
+        }
+        th {
+            background: #f1f5f9;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e9edf2;
+            vertical-align: top;
+        }
+        tr:hover td {
+            background: #fafcff;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-passed { background: #dcfce7; color: #166534; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+        .status-active { background: #dbeafe; color: #1e40af; }
+        .status-inactive { background: #fef3c7; color: #92400e; }
+        .status-paid { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-resolved { background: #dbeafe; color: #1e40af; }
+        .status-within { background: #dcfce7; color: #166534; }
+        .status-exceeded { background: #fee2e2; color: #991b1b; }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 8px 0 12px;
+        }
+        .kpi-item {
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border-left: 4px solid #1a7b5e;
+        }
+        .kpi-item .label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .kpi-item .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0a3d62;
+            margin-top: 2px;
+        }
+        .kpi-item .status-icon {
+            font-size: 14px;
+            margin-left: 6px;
+        }
+        .footer-note {
+            margin-top: 30px;
+            padding: 20px 0 10px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .badge-blue { background: #dbeafe; color: #1e40af; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-orange { background: #fef3c7; color: #92400e; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+        @media print {
+            body { background: #fff; padding: 10px; }
+            .print-btn { display: none; }
+            .main-header { background: #0a3d62 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .report-section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            th { background: #e9edf2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .kpi-item { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .logo-icon { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+        @media (max-width: 700px) {
+            .main-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .header-title { text-align: left; width: 100%; }
+            .print-btn { width: 100%; text-align: center; }
+            .logo-text .brand { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ========================================================= -->
+        <!-- HEADER WITH NILPAY LOGO                                     -->
+        <!-- ========================================================= -->
+        <header class="main-header">
+            <div class="logo-section">
+                <div class="logo-icon">nil</div>
+                <div class="logo-text">
+                    <div class="brand">nil<span>pay</span></div>
+                    <div class="tagline-ar">ادفع بالساهلة</div>
+                </div>
+            </div>
+            <div class="header-title">
+                <h1>📊 NGO Reports Dashboard</h1>
+                <div class="sub">Complete reporting suite · Cash Assistance Program</div>
+            </div>
+            <button class="print-btn" onclick="window.print()">🖨️ Save as PDF</button>
+        </header>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 1                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">1. Daily Registration &amp; Wallet Activation <span>Steps 1–5</span></div>
+            <div class="report-desc">Tracks beneficiaries from identification through wallet activation, including phone type, ID verification, and registration duration.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SN#</th><th>CARD#</th><th>Beneficiary (Eng)</th><th>Beneficiary (Ar)</th>
+                        <th>Phone Type</th><th>ID Verification</th><th>Reg. Date</th><th>Reg. Time</th>
+                        <th>Duration (min)</th><th>Wallet Status</th><th>NilPay Rep</th><th>NGO User</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001</td><td>NP-1001</td><td>Ahmed Osman</td><td>أحمد عثمان</td>
+                        <td>Smartphone</td><td><span class="status-badge status-passed">Passed</span></td>
+                        <td>09/09/2026</td><td>09:15 AM</td><td>4</td>
+                        <td><span class="status-badge status-active">Active</span></td><td>Ali Hassan</td><td>Sara Mohamed</td>
+                    </tr>
+                    <tr>
+                        <td>002</td><td>NP-1002</td><td>Fatima Ali</td><td>فاطمة علي</td>
+                        <td>Standard Phone</td><td><span class="status-badge status-passed">Passed</span></td>
+                        <td>09/09/2026</td><td>09:45 AM</td><td>5</td>
+                        <td><span class="status-badge status-active">Active</span></td><td>Ali Hassan</td><td>Sara Mohamed</td>
+                    </tr>
+                    <tr>
+                        <td>003</td><td>NP-1003</td><td>Mohamed Elhassan</td><td>محمد الحسن</td>
+                        <td>No Phone</td><td><span class="status-badge status-failed">Failed</span></td>
+                        <td>09/09/2026</td><td>10:10 AM</td><td>3</td>
+                        <td><span class="status-badge status-inactive">Inactive</span></td><td>Ali Hassan</td><td>—</td>
+                    </tr>
+                    <tr>
+                        <td>004</td><td>NP-1004</td><td>Huda Ibrahim</td><td>هدى إبراهيم</td>
+                        <td>Smartphone</td><td><span class="status-badge status-passed">Passed</span></td>
+                        <td>09/09/2026</td><td>10:30 AM</td><td>5</td>
+                        <td><span class="status-badge status-active">Active</span></td><td>Omar Khaled</td><td>Sara Mohamed</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:14px; font-size:13px; color:#475569; display:flex; gap:30px; flex-wrap:wrap;">
+                <span>✅ Total Registered: 4</span>
+                <span>✅ Active Wallets: 3</span>
+                <span>⚠️ Failed Verifications: 1</span>
+                <span>⏱️ Avg. Registration Time: 4.25 min</span>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 2                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">2. NGO Fund Deposit &amp; Disbursement <span>Steps 6–7</span></div>
+            <div class="report-desc">Tracks NGO deposits, 3% commission, net disbursable amounts, and remaining balances.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Deposit Batch #</th><th>Deposit Date</th><th>Total Deposited (SDG)</th>
+                        <th>3% Commission (SDG)</th><th>Net Available (SDG)</th>
+                        <th>Total Disbursed (SDG)</th><th>Remaining (SDG)</th>
+                        <th># Beneficiaries Paid</th><th>Disbursement Date</th><th>NGO Approver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DEP-001</td><td>09/09/2026</td><td>5,000,000</td><td>150,000</td>
+                        <td>4,850,000</td><td>4,800,000</td><td>50,000</td>
+                        <td>32</td><td>09/09/2026</td><td>Sara Mohamed</td>
+                    </tr>
+                    <tr>
+                        <td>DEP-002</td><td>10/09/2026</td><td>3,000,000</td><td>90,000</td>
+                        <td>2,910,000</td><td>2,500,000</td><td>410,000</td>
+                        <td>17</td><td>10/09/2026</td><td>Ahmed Nour</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:14px; font-size:13px; color:#475569; background:#f1f5f9; padding:10px 16px; border-radius:10px;">
+                <strong>Reconciliation:</strong> Total Deposits = 8,000,000 SDG &nbsp;|&nbsp; Total 3% Commission = 240,000 SDG &nbsp;|&nbsp; Total Disbursed = 7,300,000 SDG &nbsp;|&nbsp; Total Remaining = 460,000 SDG
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 3                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">3. Beneficiary Disbursement Status <span>Master Tracker</span></div>
+            <div class="report-desc">Full lifecycle tracking from allocation to payment, including fees deducted and transfer modality.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SN#</th><th>CARD#</th><th>Beneficiary (Eng)</th><th>Beneficiary (Ar)</th>
+                        <th>Delegate (Eng)</th><th>Delegate (Ar)</th><th>Bank Name</th><th>Bank Acct #</th>
+                        <th>Allocated (SDG)</th><th>Received (SDG)</th><th>Modality</th>
+                        <th>Status</th><th>Transfer Date</th><th>Day</th><th>Fee (SDG)</th><th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001</td><td>NP-1001</td><td>Ahmed Osman</td><td>أحمد عثمان</td>
+                        <td>—</td><td>—</td><td>NilPay Wallet</td><td>N/A</td>
+                        <td>150,000</td><td>150,000</td><td>Wallet Load</td>
+                        <td><span class="status-badge status-paid">Paid</span></td><td>09/09/2026</td><td>Monday</td><td>0</td><td>—</td>
+                    </tr>
+                    <tr>
+                        <td>002</td><td>NP-1002</td><td>Fatima Ali</td><td>فاطمة علي</td>
+                        <td>—</td><td>—</td><td>Bank of Khartoum</td><td>123456789</td>
+                        <td>250,000</td><td>249,500</td><td>Bank Transfer</td>
+                        <td><span class="status-badge status-paid">Paid</span></td><td>09/09/2026</td><td>Monday</td><td>500</td><td>Transfer fee deducted</td>
+                    </tr>
+                    <tr>
+                        <td>003</td><td>NP-1003</td><td>Mohamed Elhassan</td><td>محمد الحسن</td>
+                        <td>—</td><td>—</td><td>NilPay Wallet</td><td>N/A</td>
+                        <td>100,000</td><td>0</td><td>Wallet Load</td>
+                        <td><span class="status-badge status-pending">Pending</span></td><td>—</td><td>—</td><td>0</td><td>Awaiting NGO deposit</td>
+                    </tr>
+                    <tr>
+                        <td>004</td><td>NP-1004</td><td>Huda Ibrahim</td><td>هدى إبراهيم</td>
+                        <td>Khalid Ali</td><td>خالد علي</td><td>Omdurman Bank</td><td>987654321</td>
+                        <td>200,000</td><td>0</td><td>Bank Transfer</td>
+                        <td><span class="status-badge status-failed">Failed</span></td><td>09/09/2026</td><td>Monday</td><td>500</td><td>Invalid account number</td>
+                    </tr>
+                    <tr>
+                        <td>005</td><td>NP-1005</td><td>Yousif Adam</td><td>يوسف آدم</td>
+                        <td>—</td><td>—</td><td>NilPay Wallet</td><td>N/A</td>
+                        <td>75,000</td><td>75,000</td><td>POS Voucher</td>
+                        <td><span class="status-badge status-paid">Paid</span></td><td>09/09/2026</td><td>Monday</td><td>0</td><td>Redeemed at POS</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:12px; font-size:12px; display:flex; gap:18px; flex-wrap:wrap; color:#475569;">
+                <span><span class="badge-blue">Paid</span> 3</span>
+                <span><span class="badge-orange">Pending</span> 1</span>
+                <span><span class="status-badge status-failed">Failed</span> 1</span>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 4                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">4. Fee &amp; Commission Reconciliation <span>Financial Transparency</span></div>
+            <div class="report-desc">Detailed breakdown of all fees collected – 3% commission, POS fees, bank transfer fees, and voucher reload fees.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fee Category</th><th># Transactions</th><th>Unit Fee (SDG)</th>
+                        <th>Total Collected (SDG)</th><th>Included in 3%?</th><th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Service Fee per Distribution (3%)</td><td>32</td><td>3% of total</td>
+                        <td>150,000</td><td><span class="status-badge status-passed">Yes</span></td>
+                        <td>Covers agent commissions, cash transport, etc.</td>
+                    </tr>
+                    <tr>
+                        <td>POS Transaction Fee</td><td>45</td><td>50</td>
+                        <td>2,250</td><td><span class="status-badge status-failed">No</span></td>
+                        <td>Charged per POS transaction (Step 9)</td>
+                    </tr>
+                    <tr>
+                        <td>Bank Transfer Fee</td><td>12</td><td>500</td>
+                        <td>6,000</td><td><span class="status-badge status-failed">No</span></td>
+                        <td>Charged per bank transfer (Step 10)</td>
+                    </tr>
+                    <tr>
+                        <td>Voucher Load / Recharge Fee</td><td>8</td><td>50</td>
+                        <td>400</td><td><span class="status-badge status-failed">No</span></td>
+                        <td>Charged per reload (Page 3)</td>
+                    </tr>
+                    <tr style="font-weight:700; background:#f8fafc;">
+                        <td><strong>Total Fees Collected</strong></td><td>—</td><td>—</td>
+                        <td><strong>158,650</strong></td><td>—</td><td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:14px; font-size:13px; background:#f1f5f9; padding:10px 16px; border-radius:10px; color:#1e293b;">
+                ✅ <strong>Reconciliation Check:</strong> NGO Deposit = 5,000,000 SDG &nbsp;|&nbsp; 3% Commission = 150,000 SDG &nbsp;|&nbsp; Net Disbursed = 4,800,000 SDG &nbsp;|&nbsp; Remaining = 50,000 SDG &nbsp;→ <strong>Balanced ✅</strong>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 5                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">5. Exception / Error Report <span>Issues Requiring Intervention</span></div>
+            <div class="report-desc">Tracks failed verifications, failed payments, limit breaches, and resolution status.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SN#</th><th>CARD#</th><th>Beneficiary (Eng)</th><th>Error Type</th>
+                        <th>Error Description</th><th>Date Detected</th><th>Action Taken</th>
+                        <th>Resolved By</th><th>Resolution Date</th><th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001</td><td>NP-1003</td><td>Mohamed Elhassan</td><td>ID Verification Failed</td>
+                        <td>National ID did not match Civil Registry</td><td>09/09/2026</td>
+                        <td>Requested physical ID re-verification</td><td>Ali Hassan</td><td>10/09/2026</td>
+                        <td><span class="status-badge status-resolved">Resolved</span></td>
+                    </tr>
+                    <tr>
+                        <td>002</td><td>NP-1004</td><td>Huda Ibrahim</td><td>Bank Transfer Failed</td>
+                        <td>Invalid account number</td><td>09/09/2026</td>
+                        <td>Contacted beneficiary for correct details</td><td>Sara Mohamed</td><td>10/09/2026</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>003</td><td>NP-1006</td><td>Samira Ahmed</td><td>Limit Breach</td>
+                        <td>Single transfer exceeded 1,000,000 SDG limit</td><td>09/09/2026</td>
+                        <td>Split into two transactions</td><td>System</td><td>09/09/2026</td>
+                        <td><span class="status-badge status-resolved">Resolved</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 6                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">6. Transaction Limit Monitoring <span>Step 11 Compliance</span></div>
+            <div class="report-desc">Monitors daily and single-transfer limits to prevent breaches.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>CARD#</th><th>Beneficiary (Eng)</th><th>Date</th><th># Txns (Today)</th>
+                        <th>Total Today (SDG)</th><th>Daily Limit (SDG)</th><th>Remaining (SDG)</th>
+                        <th>Single Transfer (SDG)</th><th>Single Limit (SDG)</th><th>Limit Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>NP-1007</td><td>Omar Bashir</td><td>09/09/2026</td><td>3</td>
+                        <td>8,500,000</td><td>10,000,000</td><td>1,500,000</td>
+                        <td>4,000,000</td><td>1,000,000</td>
+                        <td><span class="status-badge status-exceeded">⚠️ Exceeded</span></td>
+                    </tr>
+                    <tr>
+                        <td>NP-1008</td><td>Rania Mustafa</td><td>09/09/2026</td><td>2</td>
+                        <td>1,200,000</td><td>10,000,000</td><td>8,800,000</td>
+                        <td>600,000</td><td>1,000,000</td>
+                        <td><span class="status-badge status-within">✅ Within</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 7                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">7. Dashboard KPI Report <span>High-Level Summary</span></div>
+            <div class="report-desc">Key performance indicators for management and real-time monitoring.</div>
+            <div class="kpi-grid">
+                <div class="kpi-item"><div class="label">Total Beneficiaries Registered</div><div class="value">1,245 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 1,500 · On Track</div></div>
+                <div class="kpi-item"><div class="label">Active Wallets</div><div class="value">1,180 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 1,350 · On Track</div></div>
+                <div class="kpi-item"><div class="label">Total Disbursed (SDG)</div><div class="value">18,750,000 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 20,000,000 · On Track</div></div>
+                <div class="kpi-item"><div class="label">Total NGO Deposits (SDG)</div><div class="value">19,312,500 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 20,600,000 · On Track</div></div>
+                <div class="kpi-item"><div class="label">3% Commission Collected (SDG)</div><div class="value">562,500 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 600,000 · On Track</div></div>
+                <div class="kpi-item" style="border-left-color:#0ea5e9;"><div class="label">Avg. Registration Time</div><div class="value">4.2 min <span class="status-icon">✅</span></div><div style="font-size:12px; color:#64748b;">Target: 5.0 · Excellent</div></div>
+                <div class="kpi-item" style="border-left-color:#0ea5e9;"><div class="label">ID Verification Success</div><div class="value">94.8% <span class="status-icon">✅</span></div><div style="font-size:12px; color:#64748b;">Target: 95% · On Target</div></div>
+                <div class="kpi-item" style="border-left-color:#f59e0b;"><div class="label">Payment Success Rate</div><div class="value">97.2% <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 98% · Slightly Below</div></div>
+                <div class="kpi-item"><div class="label">POS Fees Collected (SDG)</div><div class="value">22,500 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 25,000 · On Track</div></div>
+                <div class="kpi-item"><div class="label">Bank Transfer Fees (SDG)</div><div class="value">30,000 <span class="status-icon">🔶</span></div><div style="font-size:12px; color:#64748b;">Target: 35,000 · On Track</div></div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 8                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">8. Beneficiary Usage Report <span>Post-Disbursement (Steps 9–10)</span></div>
+            <div class="report-desc">Tracks how beneficiaries use their funds – POS purchases and bank transfers.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>CARD#</th><th>Beneficiary (Eng)</th><th>Date</th><th>Transaction Type</th>
+                        <th>Amount (SDG)</th><th>Fee (SDG)</th><th>Net Used (SDG)</th>
+                        <th>POS Location / Bank</th><th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>NP-1001</td><td>Ahmed Osman</td><td>10/09/2026</td><td>POS Purchase</td>
+                        <td>25,000</td><td>50</td><td>24,950</td><td>Al-Madina Supermarket</td><td>Groceries</td>
+                    </tr>
+                    <tr>
+                        <td>NP-1001</td><td>Ahmed Osman</td><td>10/09/2026</td><td>POS Purchase</td>
+                        <td>10,000</td><td>50</td><td>9,950</td><td>Pharmacy</td><td>Medicines</td>
+                    </tr>
+                    <tr>
+                        <td>NP-1002</td><td>Fatima Ali</td><td>11/09/2026</td><td>Bank Transfer</td>
+                        <td>249,500</td><td>500</td><td>249,000</td><td>Bank of Khartoum</td><td>Rent Payment</td>
+                    </tr>
+                    <tr>
+                        <td>NP-1005</td><td>Yousif Adam</td><td>11/09/2026</td><td>POS Purchase</td>
+                        <td>75,000</td><td>50</td><td>74,950</td><td>Omdurman Market</td><td>Supplies</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 9                                                   -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">9. Weekly Summary Report <span>Consolidated Performance</span></div>
+            <div class="report-desc">Weekly roll-up of all key metrics for management review.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th><th>Week 1<br>(Sep 1–7)</th><th>Week 2<br>(Sep 8–14)</th>
+                        <th>Week 3<br>(Sep 15–21)</th><th>Week 4<br>(Sep 22–30)</th><th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Beneficiaries Registered</td><td>210</td><td>320</td><td>410</td><td>305</td><td><strong>1,245</strong></td></tr>
+                    <tr><td>Wallets Activated</td><td>195</td><td>305</td><td>395</td><td>285</td><td><strong>1,180</strong></td></tr>
+                    <tr><td>Total NGO Deposits (SDG)</td><td>3,150,000</td><td>4,800,000</td><td>6,150,000</td><td>5,212,500</td><td><strong>19,312,500</strong></td></tr>
+                    <tr><td>3% Commission (SDG)</td><td>94,500</td><td>144,000</td><td>184,500</td><td>139,500</td><td><strong>562,500</strong></td></tr>
+                    <tr><td>Total Disbursed (SDG)</td><td>3,055,500</td><td>4,656,000</td><td>5,965,500</td><td>5,073,000</td><td><strong>18,750,000</strong></td></tr>
+                    <tr><td>POS Transactions</td><td>65</td><td>120</td><td>180</td><td>85</td><td><strong>450</strong></td></tr>
+                    <tr><td>Bank Transfers</td><td>18</td><td>28</td><td>42</td><td>32</td><td><strong>120</strong></td></tr>
+                    <tr><td>Payment Success Rate</td><td>96%</td><td>97%</td><td>98%</td><td>97.5%</td><td><strong>97.2%</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- REPORT 10                                                  -->
+        <!-- ========================================================= -->
+        <div class="report-section">
+            <div class="report-title">10. Audit Trail Report <span>Compliance &amp; Transparency</span></div>
+            <div class="report-desc">Full audit log of all actions performed across the workflow.</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Audit ID</th><th>Timestamp</th><th>User Role</th><th>Action Performed</th>
+                        <th>Beneficiary CARD#</th><th>Details</th><th>System/Manual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>AUD-001</td><td>09/09/2026 09:15</td><td>NilPay Rep</td><td>Beneficiary Registration</td><td>NP-1001</td><td>Registered with Smartphone</td><td><span class="badge-blue">System</span></td></tr>
+                    <tr><td>AUD-002</td><td>09/09/2026 09:17</td><td>System</td><td>ID Verification</td><td>NP-1001</td><td>Passed</td><td><span class="badge-blue">System</span></td></tr>
+                    <tr><td>AUD-003</td><td>09/09/2026 09:20</td><td>NGO User</td><td>Disbursement Confirmation</td><td>NP-1001</td><td>Amount: 150,000 SDG</td><td><span class="badge-orange">Manual</span></td></tr>
+                    <tr><td>AUD-004</td><td>09/09/2026 09:21</td><td>System</td><td>Wallet Activation</td><td>NP-1001</td><td>Wallet Activated</td><td><span class="badge-blue">System</span></td></tr>
+                    <tr><td>AUD-005</td><td>09/09/2026 10:00</td><td>System</td><td>Fund Transfer</td><td>NP-1001</td><td>150,000 SDG sent</td><td><span class="badge-blue">System</span></td></tr>
+                    <tr><td>AUD-006</td><td>09/09/2026 10:01</td><td>System</td><td>Notification</td><td>NP-1001</td><td>SMS notification sent</td><td><span class="badge-blue">System</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- FOOTER                                                     -->
+        <!-- ========================================================= -->
+        <div class="footer-note">
+            <strong>nilpay</strong> · ادفع بالساهلة &nbsp;|&nbsp; NGO Reports Suite &bull; Generated on 09 September 2026 &bull; All amounts in SDG (Sudanese Pounds)
+        </div>
+
+    </div>
+</body>
+</html>
